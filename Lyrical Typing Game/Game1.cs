@@ -9,6 +9,8 @@ namespace Lyrical_Typing_Game
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        public static GameWindow gameWindow;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -26,6 +28,10 @@ namespace Lyrical_Typing_Game
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            gameWindow = Window;
+
+
 
             // TODO: use this.Content to load your game content here
         }
