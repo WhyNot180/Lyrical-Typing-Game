@@ -11,6 +11,8 @@ namespace Lyrical_Typing_Game
 
         public static GameWindow gameWindow;
 
+        private Level level;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -31,7 +33,7 @@ namespace Lyrical_Typing_Game
 
             gameWindow = Window;
 
-
+            level = new Level(new Song("Dope Song"));
 
             // TODO: use this.Content to load your game content here
         }
@@ -42,7 +44,7 @@ namespace Lyrical_Typing_Game
                 Exit();
 
             // TODO: Add your update logic here
-
+            level.Update();
             base.Update(gameTime);
         }
 

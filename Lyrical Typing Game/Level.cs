@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace Lyrical_Typing_Game
 {
@@ -18,29 +20,50 @@ namespace Lyrical_Typing_Game
 
         private int errors = 0;
 
-        public string Name { get; }
-        public Level(string name) 
-        {
-            Name = name;
+        private Song song;
 
+        private bool end = false;
+
+        public Level(Song song) 
+        {
+            this.song = song;
+            currentWord.Append(song.Lyrics.Dequeue());
             Game1.gameWindow.TextInput += TextInputHandler;
 
+        }
+
+        public void Update()
+        {
+            if (end)
+            {
+                
+            }
         }
 
         private void TextInputHandler(object sender, TextInputEventArgs e)
         {
             if (e.Character == currentWord[currentCharacter])
             {
+                Debug.WriteLine(e.Character);
                 currentCharacter++;
-            } else
+            } else if (char.IsLetterOrDigit(e.Character))
             {
                 errors++;
             }
-
+            Debug.WriteLine(currentCharacter);
+            Debug.WriteLine(currentWord.Length);
             if (currentCharacter == currentWord.Length)
             {
+                currentCharacter = 0;
                 currentWord.Clear();
-                currentWord.Append();
+                if (song.Lyrics.Any())
+                {
+                    currentWord.Append(song.Lyrics.Dequeue());
+                } else
+                {
+                    end = true;
+                    Game1.gameWindow.TextInput -= TextInputHandler;
+                }
             }
         }
     }
