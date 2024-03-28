@@ -2,16 +2,21 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Lyrical_Typing_Game
 {
     public class Level
     {
+
+        private SpriteFont Font;
 
         private StringBuilder currentWord = new StringBuilder(32);
 
@@ -29,7 +34,7 @@ namespace Lyrical_Typing_Game
         private float currentTime = 0.0f;
         private float timeStamp;
 
-        public Level(Song song) 
+        public Level(Song song, ContentManager Content) 
         {
             this.song = song;
 
@@ -37,6 +42,8 @@ namespace Lyrical_Typing_Game
             currentWord.Append(initialLyric.Item1);
             timeStamp = initialLyric.Item2;
             Game1.gameWindow.TextInput += TextInputHandler;
+
+            Font = Content.Load<SpriteFont>("Lyric Font");
 
 
         }
@@ -64,6 +71,11 @@ namespace Lyrical_Typing_Game
                 Game1.gameWindow.TextInput -= TextInputHandler;
                 end = true;
             }
+        }
+
+        public void Draw(SpriteBatch _spriteBatch)
+        {
+            _spriteBatch.DrawString(Font, currentWord, new Vector2(100,100), Color.Black, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
         }
 
         private void TextInputHandler(object sender, TextInputEventArgs e)

@@ -33,7 +33,7 @@ namespace Lyrical_Typing_Game
 
             gameWindow = Window;
 
-            level = new Level(new Song("Dope Song"));
+            level = new Level(new Song("Dope Song"), Content);
 
             // TODO: use this.Content to load your game content here
         }
@@ -52,6 +52,9 @@ namespace Lyrical_Typing_Game
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            _spriteBatch.Begin();
+            level.Draw(_spriteBatch);
+            _spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
