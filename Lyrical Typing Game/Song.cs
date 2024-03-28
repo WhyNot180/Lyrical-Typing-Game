@@ -10,13 +10,15 @@ namespace Lyrical_Typing_Game
     {
         public string Name { get; }
 
-        public Queue<string> Lyrics { get; } = new Queue<string>();
+        public Queue<(string, float)> Lyrics { get; } = new Queue<(string, float)>();
+
+        
 
         public Song(string name) 
         {
             Name = name;
-            Lyrics.Enqueue("words");
-            Lyrics.Enqueue("More words");
+            Lyrics.Enqueue(("words", 10.0f));
+            Lyrics.Enqueue(("More words", 15.0f));
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Lyrical_Typing_Game
                 Exit();
 
             // TODO: Add your update logic here
-            level.Update();
+            level.Update(gameTime);
             base.Update(gameTime);
         }
 
