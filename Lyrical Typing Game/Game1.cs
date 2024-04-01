@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lyrical_Typing_Game
 {
@@ -11,7 +13,8 @@ namespace Lyrical_Typing_Game
 
         public static GameWindow gameWindow;
 
-        private Level level;
+        List<Level> levels = new List<Level>();
+        Level currentLevel;
 
         public Game1()
         {
@@ -33,9 +36,16 @@ namespace Lyrical_Typing_Game
 
             gameWindow = Window;
 
-            level = new Level(new Song("Dope Song"), Content);
 
-            // TODO: use this.Content to load your game content here
+            foreach (string songPath in System.IO.Directory.GetFiles("songs"))
+            {
+                if (System.IO.Path.GetExtension(songPath).Equals(".csv"))
+                {
+                    levels.Add(new Level(new Song(System.IO.Path.GetFileNameWithoutExtension(songPath),songPath), Content));
+                }
+            }
+
+            currentLevel = levels.First();
         }
 
         protected override void Update(GameTime gameTime)
@@ -44,7 +54,7 @@ namespace Lyrical_Typing_Game
                 Exit();
 
             // TODO: Add your update logic here
-            level.Update(gameTime);
+            currentLevel.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -53,7 +63,7 @@ namespace Lyrical_Typing_Game
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            level.Draw(_spriteBatch);
+            currentLevel.Draw(_spriteBatch);
             _spriteBatch.End();
             // TODO: Add your drawing code here
 
