@@ -16,6 +16,8 @@ namespace Lyrical_Typing_Game
         List<Level> levels = new List<Level>();
         Level currentLevel;
 
+        private bool start = true;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -41,7 +43,7 @@ namespace Lyrical_Typing_Game
             {
                 if (System.IO.Path.GetExtension(songPath).Equals(".csv"))
                 {
-                    levels.Add(new Level(new Song(System.IO.Path.GetFileNameWithoutExtension(songPath),songPath), Content));
+                    levels.Add(new Level(new Song(System.IO.Path.GetFileNameWithoutExtension(songPath),songPath, Content), Content));
                 }
             }
 
@@ -54,6 +56,13 @@ namespace Lyrical_Typing_Game
                 Exit();
 
             // TODO: Add your update logic here
+
+            if (start)
+            {
+                currentLevel.Start();
+                start = false;
+            }
+
             currentLevel.Update(gameTime);
             base.Update(gameTime);
         }

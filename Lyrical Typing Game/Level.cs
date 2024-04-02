@@ -48,6 +48,11 @@ namespace Lyrical_Typing_Game
 
         }
 
+        public void Start()
+        {
+            song.Play();
+        }
+
         public void Update(GameTime gameTime)
         {
             currentTime += (float)gameTime.ElapsedGameTime.TotalSeconds;

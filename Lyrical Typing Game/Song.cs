@@ -1,9 +1,10 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NVorbis.Ogg;
+using NVorbis;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Media;
 
 namespace Lyrical_Typing_Game
 {
@@ -13,9 +14,9 @@ namespace Lyrical_Typing_Game
 
         public Queue<(string, float)> Lyrics { get; } = new Queue<(string, float)>();
 
-        
+        private Microsoft.Xna.Framework.Media.Song audio;
 
-        public Song(string name, string csvFile) 
+        public Song(string name, string csvFile, ContentManager Content) 
         {
             Name = name;
 
@@ -46,6 +47,18 @@ namespace Lyrical_Typing_Game
                     }
                 }
             }
+
+            audio = Content.Load<Microsoft.Xna.Framework.Media.Song>("Travel Light");
+        }
+
+        public void Play()
+        {
+            MediaPlayer.Play(audio);
+        }
+
+        public void Stop()
+        {
+            MediaPlayer.Stop();
         }
     }
 }
