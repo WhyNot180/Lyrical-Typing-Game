@@ -24,6 +24,7 @@ namespace Lyrical_Typing_Game
             {
                 parser.TextFieldType = FieldType.Delimited;
                 parser.SetDelimiters(",");
+                parser.HasFieldsEnclosedInQuotes = true;
                 int currentRow = 0;
                 while (!parser.EndOfData)
                 {
