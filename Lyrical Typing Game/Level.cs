@@ -80,7 +80,15 @@ namespace Lyrical_Typing_Game
 
         public void Draw(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.DrawString(Font, currentWord, new Vector2(100,100), Color.Black, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+            // Draw current word
+            _spriteBatch.DrawString(Font, currentWord, new Vector2(100,100), Color.DarkViolet, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+            // Draw number of errors
+            _spriteBatch.DrawString(Font, $"Errors: {errors}", new Vector2(0, 0), Color.DarkRed, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+            // Draw amount of word written
+            _spriteBatch.DrawString(Font, currentWord.ToString(0, currentCharacter), new Vector2(100, 200), Color.Green, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
         }
 
         private void TextInputHandler(object sender, TextInputEventArgs e)
@@ -88,12 +96,10 @@ namespace Lyrical_Typing_Game
             
             if (currentCharacter == currentWord.Length)
             {
-                errors++;
                 return;
             }
             if (e.Character == currentWord[currentCharacter])
             {
-                Debug.WriteLine(e.Character);
                 currentCharacter++;
             } else if (char.IsLetterOrDigit(e.Character))
             {
