@@ -28,11 +28,16 @@ namespace Lyrical_Typing_Game
 
         private Song song;
 
+        private bool finishedWord = false;
+
         private bool end = false;
         public bool End { get { return end; } } 
 
-        private float currentTime = 0.0f;
-        private float timeStamp;
+        private double currentTime = 0.0f;
+        private double timeStamp;
+        private double startTime = 0.0f;
+
+        private double averageWordsPerMinute;
 
         public Level(Song song, ContentManager Content) 
         {
@@ -57,23 +62,27 @@ namespace Lyrical_Typing_Game
         {
             currentTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (currentTime >= timeStamp) AdvanceLyric();
+            if (currentTime >= timeStamp && !end) AdvanceLyric();
         }
 
         private void AdvanceLyric()
         {
+            if (!finishedWord) averageWordsPerMinute += calculateWPM(currentTime - startTime);
             currentCharacter = 0;
             currentWord.Clear();
             if (song.Lyrics.Any())
             {
                 (string, float) lyric = song.Lyrics.Dequeue();
                 currentWord.Append(lyric.Item1);
+                startTime = currentTime;
                 timeStamp = lyric.Item2;
-                Debug.WriteLine(currentWord);
+                finishedWord = false;
             }
             else
             {
                 Game1.gameWindow.TextInput -= TextInputHandler;
+                averageWordsPerMinute /= song.Count;
+                averageWordsPerMinute = Math.Round(averageWordsPerMinute, 2);
                 end = true;
             }
         }
@@ -89,6 +98,11 @@ namespace Lyrical_Typing_Game
 
             // Draw amount of word written
             _spriteBatch.DrawString(Font, currentWord.ToString(0, currentCharacter), new Vector2(100, 200), Color.Green, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+            if (end)
+            {
+                _spriteBatch.DrawString(Font, $"Average words per minute: {averageWordsPerMinute}", new Vector2(300, 0), Color.Black, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            }
         }
 
         private void TextInputHandler(object sender, TextInputEventArgs e)
@@ -101,11 +115,26 @@ namespace Lyrical_Typing_Game
             if (e.Character == currentWord[currentCharacter])
             {
                 currentCharacter++;
+                if (currentCharacter == currentWord.Length)
+                {
+                    averageWordsPerMinute += calculateWPM(currentTime - startTime);
+                    finishedWord = true;
+                }
+                
             } else if (char.IsLetterOrDigit(e.Character))
             {
                 errors++;
             }
 
+        }
+
+        private double calculateWPM(double elapsedSeconds)
+        {
+            double numberOfWords = (currentCharacter + 1) / 5;
+
+            double wordsPerMinute = numberOfWords / (elapsedSeconds / 60);
+
+            return wordsPerMinute;
         }
     }
 }

@@ -14,6 +14,8 @@ namespace Lyrical_Typing_Game
 
         public Queue<(string, float)> Lyrics { get; } = new Queue<(string, float)>();
 
+        public int Count { get; private set; }
+
         private Microsoft.Xna.Framework.Media.Song audio;
 
         public Song(string name, string csvFile, ContentManager Content) 
@@ -44,6 +46,7 @@ namespace Lyrical_Typing_Game
                         } else
                         {
                             currentLyric = field;
+                            if (!currentLyric.Equals(string.Empty)) Count++;
                         }
                     }
                 }
