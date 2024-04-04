@@ -43,7 +43,7 @@ namespace Lyrical_Typing_Game
         {
             this.song = song;
 
-            (string, float) initialLyric = song.Lyrics.Dequeue();
+            (string, double) initialLyric = song.Lyrics.Dequeue();
             currentWord.Append(initialLyric.Item1);
             timeStamp = initialLyric.Item2;
             Game1.gameWindow.TextInput += TextInputHandler;
@@ -68,11 +68,13 @@ namespace Lyrical_Typing_Game
         private void AdvanceLyric()
         {
             if (!finishedWord) averageWordsPerMinute += calculateWPM(currentTime - startTime);
+
             currentCharacter = 0;
             currentWord.Clear();
+
             if (song.Lyrics.Any())
             {
-                (string, float) lyric = song.Lyrics.Dequeue();
+                (string, double) lyric = song.Lyrics.Dequeue();
                 currentWord.Append(lyric.Item1);
                 startTime = currentTime;
                 timeStamp = lyric.Item2;
@@ -81,7 +83,7 @@ namespace Lyrical_Typing_Game
             else
             {
                 Game1.gameWindow.TextInput -= TextInputHandler;
-                averageWordsPerMinute /= song.Count;
+                averageWordsPerMinute /= song.LyricsCount;
                 averageWordsPerMinute = Math.Round(averageWordsPerMinute, 2);
                 end = true;
             }
@@ -101,17 +103,19 @@ namespace Lyrical_Typing_Game
 
             if (end)
             {
+                // Draw average words per minute
                 _spriteBatch.DrawString(Font, $"Average words per minute: {averageWordsPerMinute}", new Vector2(300, 0), Color.Black, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             }
         }
 
         private void TextInputHandler(object sender, TextInputEventArgs e)
         {
-            
+            // Guard clause if reached the end of word
             if (currentCharacter == currentWord.Length)
             {
                 return;
             }
+
             if (e.Character == currentWord[currentCharacter])
             {
                 currentCharacter++;
@@ -128,6 +132,11 @@ namespace Lyrical_Typing_Game
 
         }
 
+        /// <summary>
+        /// Calculates words per minute assuming each word is 5 characters long
+        /// </summary>
+        /// <param name="elapsedSeconds"></param>
+        /// <returns>Words per minute</returns>
         private double calculateWPM(double elapsedSeconds)
         {
             double numberOfWords = (currentCharacter + 1) / 5;
