@@ -13,3 +13,16 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Lyric Font.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Lyric Font.spritefont
+
+#begin Travel Light.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Travel Light.ogg
+
