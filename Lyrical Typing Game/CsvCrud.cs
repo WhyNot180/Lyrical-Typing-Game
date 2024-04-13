@@ -2,6 +2,7 @@
 using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -27,9 +28,9 @@ namespace Lyrical_Typing_Game
 
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                HasHeaderRecord = false
+                HasHeaderRecord = true
             };
-
+            
             using (var writer = new StreamWriter(path))
             using (var csv = new CsvWriter(writer, config))
             {
@@ -58,19 +59,24 @@ namespace Lyrical_Typing_Game
             {
                 var listOfUpdated = records.FindAll(updatedRows);
                 var indexList = new List<int>();
-                listOfUpdated.ForEach(x => indexList.Add(records.FindIndex(y => y.Equals(x))));
-
-                records.RemoveAll(updatedRows);
-
-                for (int i = 0; i < listOfUpdated.Count; i++)
+                if (listOfUpdated.Any())
                 {
-                    records.Insert(indexList[i], newRow);
+                    listOfUpdated.ForEach(x => indexList.Add(records.FindIndex(y => y.Equals(x))));
+                    records.RemoveAll(updatedRows);
+
+                    for (int i = 0; i < listOfUpdated.Count; i++)
+                    {
+                        records.Insert(indexList[i], newRow);
+                    }
+                } else
+                {
+                    records = records.Append(newRow).ToList();
                 }
 
                 Delete(path);
             } else
             {
-                records.Append(newRow);
+                records = records.Append(newRow).ToList();
             }
 
 
@@ -106,11 +112,18 @@ namespace Lyrical_Typing_Game
             {
                 throw new Exception("Incorrect file type; must be .csv");
             }
+            
+            if (!File.Exists(path))
+            {
+                return new List<T>();
+            }
 
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                HasHeaderRecord = false
+                HasHeaderRecord = true
             };
+
+
             using(var reader = new StreamReader(path))
             using(var csv = new CsvReader(reader, config))
             {
