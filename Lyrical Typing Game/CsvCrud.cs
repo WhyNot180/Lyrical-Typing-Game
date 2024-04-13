@@ -54,21 +54,27 @@ namespace Lyrical_Typing_Game
 
             var records = Read(path);
 
-            List<T> recordsList = records.ToList();
-            var listOfUpdated = recordsList.FindAll(updatedRows);
-            var indexList = new List<int>();
-            listOfUpdated.ForEach(x => indexList.Add(recordsList.FindIndex(y => y.Equals(x))));
-
-            recordsList.RemoveAll(updatedRows);
-
-            for (int i = 0; i < listOfUpdated.Count; i++)
+            if (records.Any())
             {
-                recordsList.Insert(indexList[i], newRow);
+                var listOfUpdated = records.FindAll(updatedRows);
+                var indexList = new List<int>();
+                listOfUpdated.ForEach(x => indexList.Add(records.FindIndex(y => y.Equals(x))));
+
+                records.RemoveAll(updatedRows);
+
+                for (int i = 0; i < listOfUpdated.Count; i++)
+                {
+                    records.Insert(indexList[i], newRow);
+                }
+
+                Delete(path);
+            } else
+            {
+                records.Append(newRow);
             }
 
-            Delete(path);
 
-            Append(path, recordsList);
+            Append(path, records);
         }
 
         /// <summary>
@@ -93,7 +99,7 @@ namespace Lyrical_Typing_Game
         /// <param name="path">Path to csv file</param>
         /// <returns>Rows of type T</returns>
         /// <exception cref="Exception">Thrown if file does not have the csv extension</exception>
-        public static IEnumerable<T> Read(string path)
+        public static List<T> Read(string path)
         {
 
             if (!path.EndsWith(".csv"))
@@ -108,7 +114,7 @@ namespace Lyrical_Typing_Game
             using(var reader = new StreamReader(path))
             using(var csv = new CsvReader(reader, config))
             {
-                return csv.GetRecords<T>();
+                return csv.GetRecords<T>().ToList();
             }
         }
     }
