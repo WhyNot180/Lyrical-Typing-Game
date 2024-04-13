@@ -43,7 +43,7 @@ namespace Lyrical_Typing_Game
             {
                 if (System.IO.Path.GetExtension(songPath).Equals(".csv"))
                 {
-                    levels.Add(new Level(new Song(System.IO.Path.GetFileNameWithoutExtension(songPath),songPath, Content), Content));
+                    levels.Add(new Level(new Song(System.IO.Path.GetFileNameWithoutExtension(songPath),songPath, Content), "Bob", Content));
                 }
             }
 

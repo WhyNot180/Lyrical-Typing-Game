@@ -25,6 +25,9 @@
     <PackageReference Include="NVorbis" Version="0.10.5" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="score\DummyScore.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="songs\Travel Light.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
