@@ -53,3 +53,8 @@ Empty lines are also valid, 25
 3. Opening Content.mgcb -> clicking on "add existing item" -> selecting the audio file -> clicking save
 4. The song should now be instantiated; however, level selection is still WIP, so a random level will be selected on start
 
+## Credits
+
+Music:
+- [travelLight - airtone](https://ccmixter.org/files/airtone/56883) 
+2017 - Liscenced under Creative Commons [Attribution (3.0)](https://creativecommons.org/licenses/by/3.0/)
