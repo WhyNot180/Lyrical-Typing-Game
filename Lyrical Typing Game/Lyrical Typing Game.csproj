@@ -19,11 +19,15 @@
     <EmbeddedResource Include="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="31.0.3" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
     <PackageReference Include="NVorbis" Version="0.10.5" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="score\DummyScore.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="songs\Travel Light.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

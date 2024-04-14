@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using CsvHelper.Configuration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Lyrical_Typing_Game
 {
@@ -22,9 +18,7 @@ namespace Lyrical_Typing_Game
 
         private int currentCharacter = 0;
 
-        private int score = 0;
-
-        private int errors = 0;
+        private Score score;
 
         private Song song;
 
@@ -37,20 +31,26 @@ namespace Lyrical_Typing_Game
         private double timeStamp;
         private double startTime = 0.0f;
 
-        private double averageWordsPerMinute;
-
-        public Level(Song song, ContentManager Content) 
+        /// <summary>
+        /// Creates a level based off of a Song
+        /// </summary>
+        /// <param name="song">The song used to construct the level</param>
+        /// <param name="playerName">The name of the player playing the level</param>
+        /// <param name="Content">The game's content manager</param>
+        public Level(Song song, string playerName, ContentManager Content) 
         {
             this.song = song;
 
-            (string, double) initialLyric = song.Lyrics.Dequeue();
-            currentWord.Append(initialLyric.Item1);
-            timeStamp = initialLyric.Item2;
+            score = new Score { Errors = 0, HighScore = 0, WordsPerMinute = 0, PlayerName = playerName };
+
+            // Setup first lyric (word, timestamp)
+            Lyric initialLyric = song.LyricsQueue.Dequeue();
+            currentWord.Append(initialLyric.Words);
+            timeStamp = initialLyric.TimeStamp;
+
             Game1.gameWindow.TextInput += TextInputHandler;
 
             Font = Content.Load<SpriteFont>("Lyric Font");
-
-
         }
 
         public void Start()
@@ -67,24 +67,47 @@ namespace Lyrical_Typing_Game
 
         private void AdvanceLyric()
         {
-            if (!finishedWord) averageWordsPerMinute += calculateWPM(currentTime - startTime);
+            // If player fails to finish lyric on time, use whatever they finished to calculate WPM
+            if (!finishedWord) score.WordsPerMinute += calculateWPM(currentTime - startTime);
 
             currentCharacter = 0;
             currentWord.Clear();
 
-            if (song.Lyrics.Any())
+            // Check for end of song
+            if (song.LyricsQueue.Any())
             {
-                (string, double) lyric = song.Lyrics.Dequeue();
-                currentWord.Append(lyric.Item1);
+                Lyric lyric = song.LyricsQueue.Dequeue();
+                currentWord.Append(lyric.Words);
                 startTime = currentTime;
-                timeStamp = lyric.Item2;
+                timeStamp = lyric.TimeStamp;
                 finishedWord = false;
             }
             else
             {
                 Game1.gameWindow.TextInput -= TextInputHandler;
-                averageWordsPerMinute /= song.LyricsCount;
-                averageWordsPerMinute = Math.Round(averageWordsPerMinute, 2);
+
+                // Average the words per minute
+                score.WordsPerMinute /= song.LyricsCount;
+                score.WordsPerMinute = Math.Round(score.WordsPerMinute, 2);
+
+                // Get name matched score, save to file the best stats achieved
+
+                var config = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true
+                };
+
+                Score previousScore = CsvCrud<Score>.Read($"score\\{song.Name}.csv", config).FirstOrDefault(x => x.PlayerName.Equals(score.PlayerName), null);
+
+                if (previousScore != null)
+                {
+                    score.Errors = score.Errors < previousScore.Errors ? score.Errors : previousScore.Errors;
+                    score.WordsPerMinute = score.WordsPerMinute < previousScore.WordsPerMinute ? score.WordsPerMinute : previousScore.WordsPerMinute;
+                    score.HighScore = score.HighScore < previousScore.HighScore ? score.HighScore : previousScore.HighScore;
+                }
+
+                CsvCrud<Score>.Update($"score\\{song.Name}.csv", config, x => x.PlayerName.Equals(score.PlayerName), score);
+
                 end = true;
             }
         }
@@ -96,7 +119,7 @@ namespace Lyrical_Typing_Game
             _spriteBatch.DrawString(Font, currentWord, new Vector2(100,100), Color.DarkViolet, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
             // Draw number of errors
-            _spriteBatch.DrawString(Font, $"Errors: {errors}", new Vector2(0, 0), Color.DarkRed, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+            _spriteBatch.DrawString(Font, $"Errors: {score.Errors}", new Vector2(0, 0), Color.DarkRed, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
 
             // Draw amount of word written
             _spriteBatch.DrawString(Font, currentWord.ToString(0, currentCharacter), new Vector2(100, 200), Color.Green, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
@@ -104,7 +127,7 @@ namespace Lyrical_Typing_Game
             if (end)
             {
                 // Draw average words per minute
-                _spriteBatch.DrawString(Font, $"Average words per minute: {averageWordsPerMinute}", new Vector2(300, 0), Color.Black, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+                _spriteBatch.DrawString(Font, $"Average words per minute: {score.WordsPerMinute}", new Vector2(300, 0), Color.Black, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
             }
         }
 
@@ -121,13 +144,14 @@ namespace Lyrical_Typing_Game
                 currentCharacter++;
                 if (currentCharacter == currentWord.Length)
                 {
-                    averageWordsPerMinute += calculateWPM(currentTime - startTime);
+                    score.WordsPerMinute += calculateWPM(currentTime - startTime);
+                    score.HighScore += 20;
                     finishedWord = true;
                 }
                 
             } else if (char.IsLetterOrDigit(e.Character))
             {
-                errors++;
+                score.Errors++;
             }
 
         }
