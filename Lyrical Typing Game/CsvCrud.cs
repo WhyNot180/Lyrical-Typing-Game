@@ -16,20 +16,16 @@ namespace Lyrical_Typing_Game
         /// Appends to a csv file, or creates one and writes to it if one does not exist
         /// </summary>
         /// <param name="path">Path to csv file</param>
+        /// <param name="config">Write config</param>
         /// <param name="rows">Rows written to csv file</param>
         /// <exception cref="Exception">Thrown if file does not have the csv extension</exception>
-        public static void Append(string path, List<T> rows)
+        public static void Append(string path, CsvConfiguration config, List<T> rows)
         {
 
             if (!path.EndsWith(".csv"))
             {
                 throw new Exception("Incorrect file type; must be .csv");
             }
-
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = true
-            };
             
             using (var writer = new StreamWriter(path))
             using (var csv = new CsvWriter(writer, config))
@@ -42,10 +38,11 @@ namespace Lyrical_Typing_Game
         /// Replaces all matched rows in a csv file with a specified row
         /// </summary>
         /// <param name="path">Path to csv file</param>
+        /// <param name="config">Read/Write config</param>
         /// <param name="updatedRows">Match of rows being updated</param>
         /// <param name="newRow">Value to replace updatedElements</param>
         /// <exception cref="Exception">Thrown if file does not have the csv extension</exception>
-        public static void Update(string path, Predicate<T> updatedRows, T newRow)
+        public static void Update(string path, CsvConfiguration config, Predicate<T> updatedRows, T newRow)
         {
 
             if (!path.EndsWith(".csv"))
@@ -53,7 +50,7 @@ namespace Lyrical_Typing_Game
                 throw new Exception("Incorrect file type; must be .csv");
             }
 
-            var records = Read(path);
+            var records = Read(path, config);
 
             if (records.Any())
             {
@@ -80,7 +77,7 @@ namespace Lyrical_Typing_Game
             }
 
 
-            Append(path, records);
+            Append(path, config, records);
         }
 
         /// <summary>
@@ -103,9 +100,10 @@ namespace Lyrical_Typing_Game
         /// Reads a specified csv file
         /// </summary>
         /// <param name="path">Path to csv file</param>
+        /// <param name="config">Reader config</param>
         /// <returns>Rows of type T</returns>
         /// <exception cref="Exception">Thrown if file does not have the csv extension</exception>
-        public static List<T> Read(string path)
+        public static List<T> Read(string path, CsvConfiguration config)
         {
 
             if (!path.EndsWith(".csv"))
@@ -117,12 +115,6 @@ namespace Lyrical_Typing_Game
             {
                 return new List<T>();
             }
-
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = true
-            };
-
 
             using(var reader = new StreamReader(path))
             using(var csv = new CsvReader(reader, config))
