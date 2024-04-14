@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using CsvHelper.Configuration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,15 +31,23 @@ namespace Lyrical_Typing_Game
         private double timeStamp;
         private double startTime = 0.0f;
 
+        /// <summary>
+        /// Creates a level based off of a Song
+        /// </summary>
+        /// <param name="song">The song used to construct the level</param>
+        /// <param name="playerName">The name of the player playing the level</param>
+        /// <param name="Content">The game's content manager</param>
         public Level(Song song, string playerName, ContentManager Content) 
         {
             this.song = song;
 
             score = new Score { Errors = 0, HighScore = 0, WordsPerMinute = 0, PlayerName = playerName };
 
-            (string, double) initialLyric = song.Lyrics.Dequeue();
-            currentWord.Append(initialLyric.Item1);
-            timeStamp = initialLyric.Item2;
+            // Setup first lyric (word, timestamp)
+            Lyric initialLyric = song.LyricsQueue.Dequeue();
+            currentWord.Append(initialLyric.Words);
+            timeStamp = initialLyric.TimeStamp;
+
             Game1.gameWindow.TextInput += TextInputHandler;
 
             Font = Content.Load<SpriteFont>("Lyric Font");
@@ -58,26 +67,37 @@ namespace Lyrical_Typing_Game
 
         private void AdvanceLyric()
         {
+            // If player fails to finish lyric on time, use whatever they finished to calculate WPM
             if (!finishedWord) score.WordsPerMinute += calculateWPM(currentTime - startTime);
 
             currentCharacter = 0;
             currentWord.Clear();
 
-            if (song.Lyrics.Any())
+            // Check for end of song
+            if (song.LyricsQueue.Any())
             {
-                (string, double) lyric = song.Lyrics.Dequeue();
-                currentWord.Append(lyric.Item1);
+                Lyric lyric = song.LyricsQueue.Dequeue();
+                currentWord.Append(lyric.Words);
                 startTime = currentTime;
-                timeStamp = lyric.Item2;
+                timeStamp = lyric.TimeStamp;
                 finishedWord = false;
             }
             else
             {
                 Game1.gameWindow.TextInput -= TextInputHandler;
+
+                // Average the words per minute
                 score.WordsPerMinute /= song.LyricsCount;
                 score.WordsPerMinute = Math.Round(score.WordsPerMinute, 2);
 
-                Score previousScore = CsvCrud<Score>.Read($"score\\{song.Name}.csv").FirstOrDefault(x => x.PlayerName.Equals(score.PlayerName), null);
+                // Get name matched score, save to file the best stats achieved
+
+                var config = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true
+                };
+
+                Score previousScore = CsvCrud<Score>.Read($"score\\{song.Name}.csv", config).FirstOrDefault(x => x.PlayerName.Equals(score.PlayerName), null);
 
                 if (previousScore != null)
                 {
@@ -86,7 +106,7 @@ namespace Lyrical_Typing_Game
                     score.HighScore = score.HighScore < previousScore.HighScore ? score.HighScore : previousScore.HighScore;
                 }
 
-                CsvCrud<Score>.Update($"score\\{song.Name}.csv", x => x.PlayerName.Equals(score.PlayerName), score);
+                CsvCrud<Score>.Update($"score\\{song.Name}.csv", config, x => x.PlayerName.Equals(score.PlayerName), score);
 
                 end = true;
             }

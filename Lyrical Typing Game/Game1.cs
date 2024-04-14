@@ -38,7 +38,7 @@ namespace Lyrical_Typing_Game
 
             gameWindow = Window;
 
-
+            // Create level for each detected song csv
             foreach (string songPath in System.IO.Directory.GetFiles("songs"))
             {
                 if (System.IO.Path.GetExtension(songPath).Equals(".csv"))
@@ -47,6 +47,7 @@ namespace Lyrical_Typing_Game
                 }
             }
 
+            // Level selector is WIP
             currentLevel = levels.First();
         }
 
@@ -55,8 +56,7 @@ namespace Lyrical_Typing_Game
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
-
+            // Currently this is just used to start the music, this should instead be a switch statement for various game states
             if (start)
             {
                 currentLevel.Start();
@@ -74,7 +74,6 @@ namespace Lyrical_Typing_Game
             _spriteBatch.Begin();
             currentLevel.Draw(_spriteBatch);
             _spriteBatch.End();
-            // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }

@@ -5,6 +5,7 @@ using NVorbis.Ogg;
 using NVorbis;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
+using CsvHelper.Configuration;
 
 namespace Lyrical_Typing_Game
 {
@@ -15,7 +16,7 @@ namespace Lyrical_Typing_Game
         /// <summary>
         /// Stores lyrics as string with timestamp of when the lyric is no longer shown
         /// </summary>
-        public Queue<(string, double)> Lyrics { get; } = new Queue<(string, double)>();
+        public Queue<Lyric> LyricsQueue { get; private set; }
 
         /// <summary>
         /// Count of Lyrics excluding empty lines
@@ -36,35 +37,21 @@ namespace Lyrical_Typing_Game
         {
             Name = name;
 
-            using (TextFieldParser parser = new TextFieldParser(csvFile))
+            var config = new CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
             {
-                parser.TextFieldType = FieldType.Delimited;
-                parser.SetDelimiters(",");
-                parser.HasFieldsEnclosedInQuotes = true;
-                int currentRow = 0;
-                while (!parser.EndOfData)
-                {
-                    //Process row
-                    currentRow++;
-                    string[] fields = parser.ReadFields();
-                    if (fields.Length != 2 )
-                    {
-                        throw new Exception($"too many fields in {csvFile} on line {currentRow}");
-                    }
-                    string currentLyric = string.Empty;
-                    foreach (string field in fields)
-                    {
-                        double timeStampSeconds;
-                        if (double.TryParse(field, out timeStampSeconds)) {
-                            Lyrics.Enqueue((currentLyric, timeStampSeconds));
-                        } else
-                        {
-                            currentLyric = field;
-                            if (!currentLyric.Equals(string.Empty)) LyricsCount++;
-                        }
-                    }
-                }
-            }
+                HasHeaderRecord = false,
+                Delimiter = ",",
+                ShouldQuote = (args) => true,
+                Escape = '\"',
+                InjectionOptions = InjectionOptions.Escape,
+                Mode = CsvHelper.CsvMode.Escape,
+            };
+
+            List<Lyric> lyricsList = CsvCrud<Lyric>.Read(csvFile, config);
+
+            LyricsQueue = new Queue<Lyric>(lyricsList);
+
+            LyricsCount = lyricsList.FindAll(x => !x.Words.Equals(string.Empty)).Count;
 
             audio = Content.Load<Microsoft.Xna.Framework.Media.Song>(audioFile);
         }
