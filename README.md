@@ -15,6 +15,10 @@ This game is meant to make practicing typing a little more fun.
 The game is about typing along to the lyrics of a song, while the game keeps track of your speed, accuracy, and score.
 You can even add your own songs to the game! **(WIP; see [issue #2](https://github.com/WhyNot180/Lyrical-Typing-Game/issues/2))**
 
+## Installation
+
+To install the game you must download and extract the [latest release](https://github.com/WhyNot180/Lyrical-Typing-Game/releases/tag/v0.1.0-alpha). You can then run "Lyrical Typing Game.exe"
+
 ## Playing the game
 
 Currently, the game starts straight away upon running the program, with the song Travel Light.
