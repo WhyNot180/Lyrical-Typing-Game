@@ -53,6 +53,28 @@ Empty lines are also valid, 25
 3. Opening Content.mgcb -> clicking on "add existing item" -> selecting the audio file -> clicking save
 4. The song should now be instantiated; however, level selection is still WIP, so a random level will be selected on start
 
+## Design
+
+The initial design breakdown of the game:
+
+![](gameDesign.png)
+
+## Goals
+
+- [x] Score
+	- [x] Saveable through application
+	- [ ] Readable through application
+- [x] Levels
+- [ ] Level selection
+- [x] Song
+- [x] Custom songs 
+	- [ ] Using application
+- [ ] User Interface
+	- [ ] Start screen
+	- [ ] Level end screen
+	- [ ] Level screen
+	- [ ] Level selection screen
+
 ## Credits
 
 Music:
